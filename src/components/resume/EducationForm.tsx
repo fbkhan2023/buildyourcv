@@ -6,12 +6,18 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Trash2, GraduationCap, Building2 } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Plus, Trash2, GraduationCap, Building2, CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 export const EducationForm = () => {
-  const { resumeData, addEducation, removeEducation, updateEducation } = useResume();
+  const { resumeData, addEducation, removeEducation } = useResume();
   const [isAdding, setIsAdding] = useState(false);
   const [newEducation, setNewEducation] = useState<Partial<Education>>({});
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
 
   const handleAdd = () => {
     if (newEducation.institution && newEducation.degree) {
@@ -20,12 +26,14 @@ export const EducationForm = () => {
         institution: newEducation.institution || '',
         degree: newEducation.degree || '',
         field: newEducation.field || '',
-        startDate: newEducation.startDate || '',
-        endDate: newEducation.endDate || '',
+        startDate: startDate ? format(startDate, 'yyyy-MM') : '',
+        endDate: endDate ? format(endDate, 'yyyy-MM') : '',
         gpa: newEducation.gpa,
         description: newEducation.description,
       });
       setNewEducation({});
+      setStartDate(undefined);
+      setEndDate(undefined);
       setIsAdding(false);
     }
   };
@@ -109,19 +117,53 @@ export const EducationForm = () => {
               </div>
               <div className="space-y-2">
                 <Label>Start Date</Label>
-                <Input
-                  type="month"
-                  value={newEducation.startDate || ''}
-                  onChange={(e) => setNewEducation({ ...newEducation, startDate: e.target.value })}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !startDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {startDate ? format(startDate, "MMM yyyy") : "Select date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={startDate}
+                      onSelect={setStartDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div className="space-y-2">
                 <Label>End Date</Label>
-                <Input
-                  type="month"
-                  value={newEducation.endDate || ''}
-                  onChange={(e) => setNewEducation({ ...newEducation, endDate: e.target.value })}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !endDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {endDate ? format(endDate, "MMM yyyy") : "Select date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={endDate}
+                      onSelect={setEndDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
             <div className="space-y-2">
@@ -136,7 +178,7 @@ export const EducationForm = () => {
               <Button onClick={handleAdd} className="gradient-primary">
                 Add Education
               </Button>
-              <Button variant="outline" onClick={() => { setIsAdding(false); setNewEducation({}); }}>
+              <Button variant="outline" onClick={() => { setIsAdding(false); setNewEducation({}); setStartDate(undefined); setEndDate(undefined); }}>
                 Cancel
               </Button>
             </div>

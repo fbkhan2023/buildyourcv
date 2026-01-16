@@ -12,14 +12,17 @@ import { SkillsForm } from '@/components/resume/SkillsForm';
 import { SummaryForm } from '@/components/resume/SummaryForm';
 import { TemplateSelector } from '@/components/resume/TemplateSelector';
 import { ResumePreview } from '@/components/resume/ResumePreview';
+import { PhotoUpload } from '@/components/resume/PhotoUpload';
+import { ExportButtons } from '@/components/resume/ExportButtons';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useReactToPrint } from 'react-to-print';
-import { User, GraduationCap, Briefcase, Lightbulb, FileText, Palette, ChevronLeft, ChevronRight, Printer, Save, Eye } from 'lucide-react';
+import { User, GraduationCap, Briefcase, Lightbulb, FileText, Palette, ChevronLeft, ChevronRight, Printer, Save, Eye, Camera } from 'lucide-react';
 import { AuthModal } from '@/components/auth/AuthModal';
 
 const steps = [
   { label: 'Personal', icon: <User className="h-5 w-5" /> },
+  { label: 'Photo', icon: <Camera className="h-5 w-5" /> },
   { label: 'Education', icon: <GraduationCap className="h-5 w-5" /> },
   { label: 'Experience', icon: <Briefcase className="h-5 w-5" /> },
   { label: 'Skills', icon: <Lightbulb className="h-5 w-5" /> },
@@ -89,14 +92,16 @@ const Builder = () => {
       case 0:
         return <PersonalInfoForm />;
       case 1:
-        return <EducationForm />;
+        return <PhotoUpload />;
       case 2:
-        return <ExperienceForm />;
+        return <EducationForm />;
       case 3:
-        return <SkillsForm />;
+        return <ExperienceForm />;
       case 4:
-        return <SummaryForm />;
+        return <SkillsForm />;
       case 5:
+        return <SummaryForm />;
+      case 6:
         return <TemplateSelector />;
       default:
         return null;
@@ -148,16 +153,17 @@ const Builder = () => {
                 </Button>
 
                 {currentStep === steps.length - 1 ? (
-                  <>
+                  <div className="flex flex-wrap gap-2">
                     <Button variant="outline" onClick={handleSave} disabled={saving}>
                       <Save className="mr-2 h-4 w-4" />
                       {saving ? 'Saving...' : 'Save'}
                     </Button>
+                    <ExportButtons />
                     <Button onClick={() => handlePrint()} className="gradient-primary">
                       <Printer className="mr-2 h-4 w-4" />
-                      Print Resume
+                      Print
                     </Button>
-                  </>
+                  </div>
                 ) : (
                   <Button
                     onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
