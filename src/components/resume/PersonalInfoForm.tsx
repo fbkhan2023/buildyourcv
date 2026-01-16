@@ -8,7 +8,8 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User, Mail, Phone, MapPin, Linkedin, Globe, Briefcase, CreditCard, CalendarIcon, Car, FileText } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { User, Mail, Phone, MapPin, Linkedin, Globe, Briefcase, CreditCard, CalendarIcon, Car, FileText, Flag, Cake, MessageSquare } from 'lucide-react';
 import { format, parse } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -36,12 +37,20 @@ export const PersonalInfoForm = () => {
   const { resumeData, updatePersonalInfo } = useResume();
   const { personalInfo } = resumeData;
   
+  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(
+    personalInfo.dateOfBirth ? parse(personalInfo.dateOfBirth, 'yyyy-MM-dd', new Date()) : undefined
+  );
   const [passportExpiry, setPassportExpiry] = useState<Date | undefined>(
     personalInfo.passportExpiry ? parse(personalInfo.passportExpiry, 'yyyy-MM-dd', new Date()) : undefined
   );
   const [idExpiry, setIdExpiry] = useState<Date | undefined>(
     personalInfo.idExpiry ? parse(personalInfo.idExpiry, 'yyyy-MM-dd', new Date()) : undefined
   );
+
+  const handleDateOfBirthChange = (date: Date | undefined) => {
+    setDateOfBirth(date);
+    updatePersonalInfo('dateOfBirth', date ? format(date, 'yyyy-MM-dd') : '');
+  };
 
   const fields = [
     { name: 'fullName', label: 'Full Name', icon: User, placeholder: 'John Doe', required: true },
@@ -92,6 +101,59 @@ export const PersonalInfoForm = () => {
               </div>
             );
           })}
+
+          {/* Date of Birth */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Cake className="h-4 w-4 text-primary" />
+              Date of Birth
+            </Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !dateOfBirth && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateOfBirth ? format(dateOfBirth, "PPP") : "Select date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateOfBirth}
+                  onSelect={handleDateOfBirthChange}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* Nationality */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Flag className="h-4 w-4 text-primary" />
+              Nationality
+            </Label>
+            <Select
+              value={personalInfo.nationality || ''}
+              onValueChange={(value) => updatePersonalInfo('nationality', value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select nationality" />
+              </SelectTrigger>
+              <SelectContent className="max-h-60">
+                {countries.map((country) => (
+                  <SelectItem key={country} value={country}>
+                    {country}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Passport Details */}
@@ -242,6 +304,26 @@ export const PersonalInfoForm = () => {
                 </Select>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Comment Section */}
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-primary" />
+            Additional Comments (Optional)
+          </h3>
+          <div className="space-y-2">
+            <Label htmlFor="comment" className="flex items-center gap-2">
+              Add any additional information or notes
+            </Label>
+            <Textarea
+              id="comment"
+              placeholder="Enter any additional comments or notes you'd like to include..."
+              value={personalInfo.comment || ''}
+              onChange={(e) => updatePersonalInfo('comment', e.target.value)}
+              className="min-h-24 transition-all duration-200 focus:shadow-glow"
+            />
           </div>
         </div>
       </CardContent>

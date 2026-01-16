@@ -7,12 +7,15 @@ export interface PersonalInfo {
   website?: string;
   desiredJob: string;
   photo?: string;
+  dateOfBirth?: string;
+  nationality?: string;
   passportNumber?: string;
   passportExpiry?: string;
   idNumber?: string;
   idExpiry?: string;
   hasDrivingLicense?: boolean;
   drivingLicenseCountry?: string;
+  comment?: string;
 }
 
 export interface Education {
@@ -68,12 +71,15 @@ export const initialResumeData: ResumeData = {
     website: '',
     desiredJob: '',
     photo: '',
+    dateOfBirth: '',
+    nationality: '',
     passportNumber: '',
     passportExpiry: '',
     idNumber: '',
     idExpiry: '',
     hasDrivingLicense: false,
     drivingLicenseCountry: '',
+    comment: '',
   },
   education: [],
   experience: [],
