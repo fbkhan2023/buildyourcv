@@ -1,11 +1,62 @@
+import { useState } from 'react';
 import { useResume } from '@/contexts/ResumeContext';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { FileText } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { FileText, Sparkles, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export const SummaryForm = () => {
   const { resumeData, updateSummary } = useResume();
+  const [aiKeywords, setAiKeywords] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const generateSummary = async () => {
+    if (!aiKeywords.trim()) {
+      toast.error('Please enter some keywords for AI generation');
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      // Get experience highlights for context
+      const experienceHighlights = resumeData.experience
+        .slice(0, 3)
+        .map(exp => `${exp.position} at ${exp.company}`)
+        .join(', ');
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-text`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          type: 'summary',
+          keywords: aiKeywords,
+          context: {
+            desiredJob: resumeData.personalInfo.desiredJob,
+            experience: experienceHighlights,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to generate text');
+      }
+
+      const data = await response.json();
+      updateSummary(data.text);
+      toast.success('Summary generated successfully!');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to generate summary');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <Card className="shadow-soft animate-fade-in">
@@ -19,6 +70,35 @@ export const SummaryForm = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* AI Summary Generator */}
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            AI Summary Generator
+          </Label>
+          <div className="flex gap-2">
+            <Input
+              placeholder="Enter keywords (e.g., 5 years experience, Python, leadership, startup)"
+              value={aiKeywords}
+              onChange={(e) => setAiKeywords(e.target.value)}
+              className="flex-1"
+            />
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={generateSummary}
+              disabled={isGenerating}
+              className="gap-2"
+            >
+              {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              Generate
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Enter keywords about your skills and experience for AI to generate a professional summary
+          </p>
+        </div>
+        
         <div className="space-y-2">
           <Label htmlFor="summary">Summary</Label>
           <Textarea

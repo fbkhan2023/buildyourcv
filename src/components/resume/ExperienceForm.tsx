@@ -7,13 +7,22 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Trash2, Briefcase, Building } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Plus, Trash2, Briefcase, Building, CalendarIcon, Sparkles, Loader2 } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export const ExperienceForm = () => {
   const { resumeData, addExperience, removeExperience } = useResume();
   const [isAdding, setIsAdding] = useState(false);
   const [newExperience, setNewExperience] = useState<Partial<Experience>>({ current: false, achievements: [] });
   const [achievementInput, setAchievementInput] = useState('');
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
+  const [aiKeywords, setAiKeywords] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleAdd = () => {
     if (newExperience.company && newExperience.position) {
@@ -22,13 +31,16 @@ export const ExperienceForm = () => {
         company: newExperience.company || '',
         position: newExperience.position || '',
         location: newExperience.location || '',
-        startDate: newExperience.startDate || '',
-        endDate: newExperience.current ? 'Present' : newExperience.endDate || '',
+        startDate: startDate ? format(startDate, 'yyyy-MM') : '',
+        endDate: newExperience.current ? 'Present' : (endDate ? format(endDate, 'yyyy-MM') : ''),
         current: newExperience.current || false,
         description: newExperience.description || '',
         achievements: newExperience.achievements || [],
       });
       setNewExperience({ current: false, achievements: [] });
+      setStartDate(undefined);
+      setEndDate(undefined);
+      setAiKeywords('');
       setIsAdding(false);
     }
   };
@@ -48,6 +60,45 @@ export const ExperienceForm = () => {
       ...newExperience,
       achievements: newExperience.achievements?.filter((_, i) => i !== index) || [],
     });
+  };
+
+  const generateDescription = async () => {
+    if (!aiKeywords.trim()) {
+      toast.error('Please enter some keywords for AI generation');
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-text`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          type: 'experience',
+          keywords: aiKeywords,
+          context: {
+            position: newExperience.position,
+            company: newExperience.company,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to generate text');
+      }
+
+      const data = await response.json();
+      setNewExperience({ ...newExperience, description: data.text });
+      toast.success('Description generated successfully!');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to generate description');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -119,11 +170,28 @@ export const ExperienceForm = () => {
               </div>
               <div className="space-y-2">
                 <Label>Start Date</Label>
-                <Input
-                  type="month"
-                  value={newExperience.startDate || ''}
-                  onChange={(e) => setNewExperience({ ...newExperience, startDate: e.target.value })}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !startDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {startDate ? format(startDate, "MMM yyyy") : "Select date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={startDate}
+                      onSelect={setStartDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div className="space-y-2 flex items-center gap-2">
                 <Checkbox
@@ -138,14 +206,58 @@ export const ExperienceForm = () => {
               {!newExperience.current && (
                 <div className="space-y-2">
                   <Label>End Date</Label>
-                  <Input
-                    type="month"
-                    value={newExperience.endDate || ''}
-                    onChange={(e) => setNewExperience({ ...newExperience, endDate: e.target.value })}
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !endDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {endDate ? format(endDate, "MMM yyyy") : "Select date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={setEndDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               )}
             </div>
+            
+            {/* AI Description Generator */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                AI Description Generator
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Enter keywords (e.g., React, team lead, agile, 50% improvement)"
+                  value={aiKeywords}
+                  onChange={(e) => setAiKeywords(e.target.value)}
+                  className="flex-1"
+                />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={generateDescription}
+                  disabled={isGenerating}
+                  className="gap-2"
+                >
+                  {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                  Generate
+                </Button>
+              </div>
+            </div>
+            
             <div className="space-y-2">
               <Label>Description</Label>
               <Textarea
@@ -190,7 +302,7 @@ export const ExperienceForm = () => {
               <Button onClick={handleAdd} className="gradient-primary">
                 Add Experience
               </Button>
-              <Button variant="outline" onClick={() => { setIsAdding(false); setNewExperience({ current: false, achievements: [] }); }}>
+              <Button variant="outline" onClick={() => { setIsAdding(false); setNewExperience({ current: false, achievements: [] }); setStartDate(undefined); setEndDate(undefined); setAiKeywords(''); }}>
                 Cancel
               </Button>
             </div>

@@ -55,55 +55,73 @@ export const ResumePreview = () => {
       style={{ minHeight: '11in' }}
     >
       {/* Header */}
-      <div className={styles.header}>
-        <h1 className={cn(
-          'text-3xl font-display font-bold mb-1',
-          template !== 'modern' && 'text-foreground'
-        )}>
-          {personalInfo.fullName || 'Your Name'}
-        </h1>
-        {personalInfo.desiredJob && (
-          <p className={cn(
-            'text-xl mb-4',
-            template === 'modern' ? 'text-white/90' : 'text-muted-foreground'
-          )}>
-            {personalInfo.desiredJob}
-          </p>
-        )}
-        <div className={cn(
-          'flex flex-wrap gap-4 text-sm',
-          template === 'modern' ? 'text-white/80' : 'text-muted-foreground'
-        )}>
-          {personalInfo.email && (
-            <span className="flex items-center gap-1">
-              <Mail className="h-4 w-4" />
-              {personalInfo.email}
-            </span>
+      <div className={cn(styles.header, 'relative')}>
+        <div className="flex items-start gap-6">
+          {/* Photo */}
+          {personalInfo.photo && (
+            <div className="flex-shrink-0">
+              <img
+                src={personalInfo.photo}
+                alt={personalInfo.fullName}
+                className={cn(
+                  'w-24 h-24 rounded-full object-cover border-4',
+                  template === 'modern' ? 'border-white/30' : 'border-primary/20'
+                )}
+              />
+            </div>
           )}
-          {personalInfo.phone && (
-            <span className="flex items-center gap-1">
-              <Phone className="h-4 w-4" />
-              {personalInfo.phone}
-            </span>
-          )}
-          {personalInfo.location && (
-            <span className="flex items-center gap-1">
-              <MapPin className="h-4 w-4" />
-              {personalInfo.location}
-            </span>
-          )}
-          {personalInfo.linkedin && (
-            <span className="flex items-center gap-1">
-              <Linkedin className="h-4 w-4" />
-              {personalInfo.linkedin}
-            </span>
-          )}
-          {personalInfo.website && (
-            <span className="flex items-center gap-1">
-              <Globe className="h-4 w-4" />
-              {personalInfo.website}
-            </span>
-          )}
+          
+          <div className="flex-1">
+            <h1 className={cn(
+              'text-3xl font-display font-bold mb-1',
+              template !== 'modern' && 'text-foreground'
+            )}>
+              {personalInfo.fullName || 'Your Name'}
+            </h1>
+            {personalInfo.desiredJob && (
+              <p className={cn(
+                'text-xl mb-4',
+                template === 'modern' ? 'text-white/90' : 'text-muted-foreground'
+              )}>
+                {personalInfo.desiredJob}
+              </p>
+            )}
+            <div className={cn(
+              'flex flex-wrap gap-4 text-sm',
+              template === 'modern' ? 'text-white/80' : 'text-muted-foreground'
+            )}>
+              {personalInfo.email && (
+                <span className="flex items-center gap-1">
+                  <Mail className="h-4 w-4" />
+                  {personalInfo.email}
+                </span>
+              )}
+              {personalInfo.phone && (
+                <span className="flex items-center gap-1">
+                  <Phone className="h-4 w-4" />
+                  {personalInfo.phone}
+                </span>
+              )}
+              {personalInfo.location && (
+                <span className="flex items-center gap-1">
+                  <MapPin className="h-4 w-4" />
+                  {personalInfo.location}
+                </span>
+              )}
+              {personalInfo.linkedin && (
+                <span className="flex items-center gap-1">
+                  <Linkedin className="h-4 w-4" />
+                  {personalInfo.linkedin}
+                </span>
+              )}
+              {personalInfo.website && (
+                <span className="flex items-center gap-1">
+                  <Globe className="h-4 w-4" />
+                  {personalInfo.website}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
