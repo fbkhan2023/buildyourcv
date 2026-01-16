@@ -145,7 +145,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t py-8">
         <div className="container text-center text-muted-foreground">
-          <p>© 2024 ResumeBuilder. Build your future today.</p>
+          <p>© 2026 ResumeBuilder. Build your future today.</p>
         </div>
       </footer>
 
