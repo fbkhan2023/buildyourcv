@@ -77,7 +77,6 @@ const Builder = () => {
         setResumeData({ ...resumeData, id: data.id });
         toast.success('Resume saved successfully!');
       }
-      }
     } catch (error: any) {
       toast.error(error.message || 'Failed to save resume');
     } finally {
