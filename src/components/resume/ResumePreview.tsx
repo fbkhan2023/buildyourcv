@@ -1,6 +1,7 @@
 import { useResume } from '@/contexts/ResumeContext';
 import { cn } from '@/lib/utils';
-import { Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Globe, Cake, Flag, CreditCard, Car } from 'lucide-react';
+import { format, parse } from 'date-fns';
 
 export const ResumePreview = () => {
   const { resumeData } = useResume();
@@ -12,6 +13,16 @@ export const ResumePreview = () => {
     const [year, month] = dateStr.split('-');
     const date = new Date(parseInt(year), parseInt(month) - 1);
     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  };
+
+  const formatFullDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    try {
+      const date = parse(dateStr, 'yyyy-MM-dd', new Date());
+      return format(date, 'dd MMM yyyy');
+    } catch {
+      return dateStr;
+    }
   };
 
   // Group skills by category
@@ -52,7 +63,7 @@ export const ResumePreview = () => {
         'w-full max-w-[8.5in] mx-auto shadow-elevated rounded-lg overflow-hidden',
         styles.container
       )}
-      style={{ minHeight: '11in' }}
+      style={{ minHeight: '11in', padding: '0 1.5rem' }}
     >
       {/* Header */}
       <div className={cn(styles.header, 'relative')}>
@@ -120,13 +131,25 @@ export const ResumePreview = () => {
                   {personalInfo.website}
                 </span>
               )}
+              {personalInfo.dateOfBirth && (
+                <span className="flex items-center gap-1">
+                  <Cake className="h-4 w-4" />
+                  DOB: {formatFullDate(personalInfo.dateOfBirth)}
+                </span>
+              )}
+              {personalInfo.nationality && (
+                <span className="flex items-center gap-1">
+                  <Flag className="h-4 w-4" />
+                  {personalInfo.nationality}
+                </span>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-8 space-y-6">
+      <div className="px-10 py-8 space-y-6">
         {/* Summary */}
         {summary && (
           <div className={styles.section}>
@@ -211,6 +234,58 @@ export const ResumePreview = () => {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Document Details */}
+        {(personalInfo.passportNumber || personalInfo.idNumber || personalInfo.hasDrivingLicense) && (
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>Personal Documents</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+              {personalInfo.passportNumber && (
+                <div className="flex items-start gap-2">
+                  <CreditCard className="h-4 w-4 text-primary mt-0.5" />
+                  <div>
+                    <span className="font-medium text-foreground">Passport: </span>
+                    <span className="text-muted-foreground">
+                      {personalInfo.passportNumber}
+                      {personalInfo.passportExpiry && ` (Expires: ${formatFullDate(personalInfo.passportExpiry)})`}
+                    </span>
+                  </div>
+                </div>
+              )}
+              {personalInfo.idNumber && (
+                <div className="flex items-start gap-2">
+                  <CreditCard className="h-4 w-4 text-primary mt-0.5" />
+                  <div>
+                    <span className="font-medium text-foreground">ID Card: </span>
+                    <span className="text-muted-foreground">
+                      {personalInfo.idNumber}
+                      {personalInfo.idExpiry && ` (Expires: ${formatFullDate(personalInfo.idExpiry)})`}
+                    </span>
+                  </div>
+                </div>
+              )}
+              {personalInfo.hasDrivingLicense && (
+                <div className="flex items-start gap-2">
+                  <Car className="h-4 w-4 text-primary mt-0.5" />
+                  <div>
+                    <span className="font-medium text-foreground">Driving License: </span>
+                    <span className="text-muted-foreground">
+                      Yes{personalInfo.drivingLicenseCountry && ` (${personalInfo.drivingLicenseCountry})`}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Comment Section */}
+        {personalInfo.comment && (
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>Additional Notes</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">{personalInfo.comment}</p>
           </div>
         )}
       </div>
