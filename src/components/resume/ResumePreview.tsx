@@ -308,9 +308,9 @@ export const ResumePreview = () => {
       )}
       style={{ minHeight: '11in', padding: '0 1.5rem' }}
     >
-      {/* Header */}
-      <div className={cn(styles.header, 'relative')}>
-        <div className="flex items-start gap-6">
+      {/* Header - Compact */}
+      <div className={cn(styles.header, 'relative py-4 px-6')}>
+        <div className="flex items-center gap-4">
           {/* Photo */}
           {personalInfo.photo && (
             <div className="flex-shrink-0">
@@ -318,71 +318,71 @@ export const ResumePreview = () => {
                 src={personalInfo.photo}
                 alt={personalInfo.fullName}
                 className={cn(
-                  'w-24 h-24 rounded-full object-cover border-4',
+                  'w-20 h-20 rounded-full object-cover border-3',
                   template === 'modern' ? 'border-white/30' : 'border-primary/20'
                 )}
               />
             </div>
           )}
           
-          <div className="flex-1">
+          <div className="flex-1 space-y-1">
             <h1 className={cn(
-              'text-3xl font-display font-bold mb-1',
+              'text-2xl font-display font-bold leading-tight',
               template !== 'modern' && 'text-foreground'
             )}>
               {personalInfo.fullName || 'Your Name'}
             </h1>
             {personalInfo.desiredJob && (
               <p className={cn(
-                'text-xl mb-4',
+                'text-lg leading-tight',
                 template === 'modern' ? 'text-white/90' : 'text-muted-foreground'
               )}>
                 {personalInfo.desiredJob}
               </p>
             )}
             <div className={cn(
-              'flex flex-wrap gap-4 text-sm',
+              'flex flex-wrap gap-x-3 gap-y-0.5 text-xs leading-tight',
               template === 'modern' ? 'text-white/80' : 'text-muted-foreground'
             )}>
               {personalInfo.email && (
                 <span className="flex items-center gap-1">
-                  <Mail className="h-4 w-4" />
+                  <Mail className="h-3 w-3" />
                   {personalInfo.email}
                 </span>
               )}
               {personalInfo.phone && (
                 <span className="flex items-center gap-1">
-                  <Phone className="h-4 w-4" />
+                  <Phone className="h-3 w-3" />
                   {personalInfo.phone}
                 </span>
               )}
               {personalInfo.location && (
                 <span className="flex items-center gap-1">
-                  <MapPin className="h-4 w-4" />
+                  <MapPin className="h-3 w-3" />
                   {personalInfo.location}
                 </span>
               )}
               {personalInfo.linkedin && (
                 <span className="flex items-center gap-1">
-                  <Linkedin className="h-4 w-4" />
+                  <Linkedin className="h-3 w-3" />
                   {personalInfo.linkedin}
                 </span>
               )}
               {personalInfo.website && (
                 <span className="flex items-center gap-1">
-                  <Globe className="h-4 w-4" />
+                  <Globe className="h-3 w-3" />
                   {personalInfo.website}
                 </span>
               )}
               {personalInfo.dateOfBirth && (
                 <span className="flex items-center gap-1">
-                  <Cake className="h-4 w-4" />
+                  <Cake className="h-3 w-3" />
                   DOB: {formatFullDate(personalInfo.dateOfBirth)}
                 </span>
               )}
               {personalInfo.nationality && (
                 <span className="flex items-center gap-1">
-                  <Flag className="h-4 w-4" />
+                  <Flag className="h-3 w-3" />
                   {personalInfo.nationality}
                 </span>
               )}
@@ -392,7 +392,7 @@ export const ResumePreview = () => {
       </div>
 
       {/* Content */}
-      <div className="px-10 py-8 space-y-6">
+      <div className="px-12 py-6 space-y-5">
         {/* Summary */}
         {summary && (
           <div className={styles.section}>
