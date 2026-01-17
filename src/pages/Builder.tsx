@@ -9,6 +9,8 @@ import { PersonalInfoForm } from '@/components/resume/PersonalInfoForm';
 import { EducationForm } from '@/components/resume/EducationForm';
 import { ExperienceForm } from '@/components/resume/ExperienceForm';
 import { SkillsForm } from '@/components/resume/SkillsForm';
+import { LanguagesForm } from '@/components/resume/LanguagesForm';
+import { CertificationsForm } from '@/components/resume/CertificationsForm';
 import { SummaryForm } from '@/components/resume/SummaryForm';
 import { TemplateSelector } from '@/components/resume/TemplateSelector';
 import { ResumePreview } from '@/components/resume/ResumePreview';
@@ -17,7 +19,7 @@ import { ExportButtons } from '@/components/resume/ExportButtons';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useReactToPrint } from 'react-to-print';
-import { User, GraduationCap, Briefcase, Lightbulb, FileText, Palette, ChevronLeft, ChevronRight, Printer, Save, Eye, Camera } from 'lucide-react';
+import { User, GraduationCap, Briefcase, Lightbulb, FileText, Palette, ChevronLeft, ChevronRight, Printer, Save, Eye, Camera, Languages, Award } from 'lucide-react';
 import { AuthModal } from '@/components/auth/AuthModal';
 
 const steps = [
@@ -26,6 +28,8 @@ const steps = [
   { label: 'Education', icon: <GraduationCap className="h-5 w-5" /> },
   { label: 'Experience', icon: <Briefcase className="h-5 w-5" /> },
   { label: 'Skills', icon: <Lightbulb className="h-5 w-5" /> },
+  { label: 'Languages', icon: <Languages className="h-5 w-5" /> },
+  { label: 'Certifications', icon: <Award className="h-5 w-5" /> },
   { label: 'Summary', icon: <FileText className="h-5 w-5" /> },
   { label: 'Template', icon: <Palette className="h-5 w-5" /> },
 ];
@@ -100,8 +104,12 @@ const Builder = () => {
       case 4:
         return <SkillsForm />;
       case 5:
-        return <SummaryForm />;
+        return <LanguagesForm />;
       case 6:
+        return <CertificationsForm />;
+      case 7:
+        return <SummaryForm />;
+      case 8:
         return <TemplateSelector />;
       default:
         return null;

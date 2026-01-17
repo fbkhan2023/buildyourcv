@@ -48,14 +48,31 @@ export interface Skill {
   category: string;
 }
 
+export interface Language {
+  id: string;
+  name: string;
+  proficiency: 'basic' | 'conversational' | 'professional' | 'fluent' | 'native';
+}
+
+export interface Certification {
+  id: string;
+  name: string;
+  issuer: string;
+  issueDate: string;
+  expiryDate?: string;
+  credentialId?: string;
+}
+
 export interface ResumeData {
   id?: string;
   title: string;
-  template: 'modern' | 'classic' | 'minimal';
+  template: 'modern' | 'classic' | 'minimal' | 'executive';
   personalInfo: PersonalInfo;
   education: Education[];
   experience: Experience[];
   skills: Skill[];
+  languages: Language[];
+  certifications: Certification[];
   summary: string;
 }
 
@@ -84,5 +101,7 @@ export const initialResumeData: ResumeData = {
   education: [],
   experience: [],
   skills: [],
+  languages: [],
+  certifications: [],
   summary: '',
 };

@@ -71,6 +71,8 @@ const MyResumes = () => {
       education: resume.education,
       experience: resume.experience,
       skills: resume.skills,
+      languages: resume.personal_info?.languages || [],
+      certifications: resume.personal_info?.certifications || [],
       summary: resume.summary || '',
     });
     navigate('/builder');
