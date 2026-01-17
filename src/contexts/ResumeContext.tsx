@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { ResumeData, initialResumeData, Education, Experience, Skill } from '@/types/resume';
+import { ResumeData, initialResumeData, Education, Experience, Skill, Language, Certification } from '@/types/resume';
 
 interface ResumeContextType {
   resumeData: ResumeData;
@@ -14,8 +14,13 @@ interface ResumeContextType {
   addSkill: (skill: Skill) => void;
   updateSkill: (id: string, skill: Skill) => void;
   removeSkill: (id: string) => void;
+  addLanguage: (language: Language) => void;
+  removeLanguage: (id: string) => void;
+  addCertification: (certification: Certification) => void;
+  updateCertification: (id: string, certification: Certification) => void;
+  removeCertification: (id: string) => void;
   updateSummary: (summary: string) => void;
-  setTemplate: (template: 'modern' | 'classic' | 'minimal') => void;
+  setTemplate: (template: 'modern' | 'classic' | 'minimal' | 'executive') => void;
   resetResume: () => void;
   currentStep: number;
   setCurrentStep: (step: number) => void;
@@ -97,11 +102,46 @@ export const ResumeProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
+  const addLanguage = (language: Language) => {
+    setResumeData(prev => ({
+      ...prev,
+      languages: [...prev.languages, language],
+    }));
+  };
+
+  const removeLanguage = (id: string) => {
+    setResumeData(prev => ({
+      ...prev,
+      languages: prev.languages.filter(l => l.id !== id),
+    }));
+  };
+
+  const addCertification = (certification: Certification) => {
+    setResumeData(prev => ({
+      ...prev,
+      certifications: [...prev.certifications, certification],
+    }));
+  };
+
+  const updateCertification = (id: string, certification: Certification) => {
+    setResumeData(prev => ({
+      ...prev,
+      certifications: prev.certifications.map(c => (c.id === id ? certification : c)),
+    }));
+  };
+
+  const removeCertification = (id: string) => {
+    setResumeData(prev => ({
+      ...prev,
+      certifications: prev.certifications.filter(c => c.id !== id),
+    }));
+  };
+
   const updateSummary = (summary: string) => {
     setResumeData(prev => ({ ...prev, summary }));
   };
 
-  const setTemplate = (template: 'modern' | 'classic' | 'minimal') => {
+  const setTemplate = (template: 'modern' | 'classic' | 'minimal' | 'executive') => {
     setResumeData(prev => ({ ...prev, template }));
   };
 
@@ -125,6 +165,11 @@ export const ResumeProvider = ({ children }: { children: ReactNode }) => {
         addSkill,
         updateSkill,
         removeSkill,
+        addLanguage,
+        removeLanguage,
+        addCertification,
+        updateCertification,
+        removeCertification,
         updateSummary,
         setTemplate,
         resetResume,

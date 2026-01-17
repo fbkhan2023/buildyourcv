@@ -22,6 +22,12 @@ const templates = [
     description: 'Simple and elegant, focuses on content',
     preview: 'bg-gradient-to-br from-background to-secondary/50',
   },
+  {
+    id: 'executive' as const,
+    name: 'Executive',
+    description: 'Two-column layout with photo, light blue accents',
+    preview: 'bg-gradient-to-br from-sky-100 to-gray-100',
+  },
 ];
 
 export const TemplateSelector = () => {
