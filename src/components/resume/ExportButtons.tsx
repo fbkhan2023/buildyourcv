@@ -25,6 +25,10 @@ export const ExportButtons = () => {
         scale: 2,
         useCORS: true,
         logging: false,
+        scrollY: -window.scrollY,
+        windowHeight: element.scrollHeight,
+        height: element.scrollHeight,
+        width: element.scrollWidth,
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -34,10 +38,25 @@ export const ExportButtons = () => {
         format: 'letter',
       });
 
-      const imgWidth = 8.5;
+      const pageWidth = 8.5;
+      const pageHeight = 11;
+      const imgWidth = pageWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      // Handle multi-page if content is taller than one page
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = -pageHeight + (imgHeight - heightLeft - pageHeight);
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, -(imgHeight - heightLeft), imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
       pdf.save(`${resumeData.personalInfo.fullName || 'resume'}.pdf`);
       toast.success('Resume exported as PDF!');
     } catch (error) {
@@ -48,10 +67,21 @@ export const ExportButtons = () => {
     }
   };
 
+  const formatFullDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    try {
+      const [year, month, day] = dateStr.split('-');
+      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch {
+      return dateStr;
+    }
+  };
+
   const exportToWord = async () => {
     setIsExportingWord(true);
     try {
-      const { personalInfo, education, experience, skills, summary } = resumeData;
+      const { personalInfo, education, experience, skills, languages, certifications, summary } = resumeData;
 
       const children: Paragraph[] = [];
 
@@ -103,9 +133,31 @@ export const ExportButtons = () => {
               }),
             ],
             alignment: AlignmentType.CENTER,
+          })
+        );
+      }
+
+      // Date of Birth & Nationality
+      const personalDetails: string[] = [];
+      if (personalInfo.dateOfBirth) personalDetails.push(`DOB: ${formatFullDate(personalInfo.dateOfBirth)}`);
+      if (personalInfo.nationality) personalDetails.push(`Nationality: ${personalInfo.nationality}`);
+      
+      if (personalDetails.length > 0) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: personalDetails.join(' | '),
+                size: 20,
+                color: '666666',
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
             spacing: { after: 400 },
           })
         );
+      } else {
+        children.push(new Paragraph({ text: '', spacing: { after: 400 } }));
       }
 
       // Summary
@@ -271,6 +323,149 @@ export const ExportButtons = () => {
             })
           );
         });
+      }
+
+      // Languages
+      if (languages.length > 0) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'LANGUAGES',
+                bold: true,
+                size: 26,
+              }),
+            ],
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 400, after: 200 },
+          })
+        );
+
+        const proficiencyLabels: Record<string, string> = {
+          basic: 'Basic',
+          conversational: 'Conversational',
+          professional: 'Professional',
+          fluent: 'Fluent',
+          native: 'Native',
+        };
+
+        languages.forEach((lang) => {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: `${lang.name}: `, bold: true, size: 22 }),
+                new TextRun({ text: proficiencyLabels[lang.proficiency] || lang.proficiency, size: 22 }),
+              ],
+            })
+          );
+        });
+      }
+
+      // Certifications
+      if (certifications.length > 0) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'CERTIFICATIONS',
+                bold: true,
+                size: 26,
+              }),
+            ],
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 400, after: 200 },
+          })
+        );
+
+        certifications.forEach((cert) => {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: cert.name, bold: true, size: 22 }),
+              ],
+            })
+          );
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: `${cert.issuer}${cert.issueDate ? ` • ${cert.issueDate}` : ''}${cert.credentialId ? ` • ID: ${cert.credentialId}` : ''}`, size: 20, color: '666666' }),
+              ],
+              spacing: { after: 100 },
+            })
+          );
+        });
+      }
+
+      // Personal Documents
+      if (personalInfo.passportNumber || personalInfo.idNumber || personalInfo.hasDrivingLicense) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'PERSONAL DOCUMENTS',
+                bold: true,
+                size: 26,
+              }),
+            ],
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 400, after: 200 },
+          })
+        );
+
+        if (personalInfo.passportNumber) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Passport: ', bold: true, size: 22 }),
+                new TextRun({ text: `${personalInfo.passportNumber}${personalInfo.passportExpiry ? ` (Expires: ${formatFullDate(personalInfo.passportExpiry)})` : ''}`, size: 22 }),
+              ],
+            })
+          );
+        }
+
+        if (personalInfo.idNumber) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'ID Card: ', bold: true, size: 22 }),
+                new TextRun({ text: `${personalInfo.idNumber}${personalInfo.idExpiry ? ` (Expires: ${formatFullDate(personalInfo.idExpiry)})` : ''}`, size: 22 }),
+              ],
+            })
+          );
+        }
+
+        if (personalInfo.hasDrivingLicense) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Driving License: ', bold: true, size: 22 }),
+                new TextRun({ text: `Yes${personalInfo.drivingLicenseCountry ? ` (${personalInfo.drivingLicenseCountry})` : ''}`, size: 22 }),
+              ],
+            })
+          );
+        }
+      }
+
+      // Additional Notes
+      if (personalInfo.comment) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'ADDITIONAL NOTES',
+                bold: true,
+                size: 26,
+              }),
+            ],
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 400, after: 200 },
+          })
+        );
+        children.push(
+          new Paragraph({
+            children: [new TextRun({ text: personalInfo.comment, size: 22 })],
+          })
+        );
       }
 
       const doc = new Document({
