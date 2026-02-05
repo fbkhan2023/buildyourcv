@@ -1,1 +1,4 @@
 project_id = "glitacpkvcvaukrmiabm"
+
+[functions.generate-company-text]
+verify_jwt = false

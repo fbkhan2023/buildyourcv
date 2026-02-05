@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { AuthModal } from '@/components/auth/AuthModal';
-import { FileText, Sparkles, Palette, Printer, Shield, Zap } from 'lucide-react';
+import { FileText, Sparkles, Palette, Printer, Shield, Zap, Building2 } from 'lucide-react';
 
 const features = [
   {
@@ -72,16 +72,31 @@ const Index = () => {
                 className="gradient-primary text-lg px-8 py-6 shadow-glow hover:shadow-elevated transition-all duration-300"
               >
                 <FileText className="mr-2 h-5 w-5" />
-                Start Building for Free
+                Resume Builder
               </Button>
-              {user && (
+              <Button
+                size="lg"
+                onClick={() => navigate('/company-builder')}
+                className="bg-slate-800 hover:bg-slate-700 text-lg px-8 py-6"
+              >
+                <Building2 className="mr-2 h-5 w-5" />
+                Company Profile Builder
+              </Button>
+            </div>
+            {user && (
+              <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
                 <Link to="/my-resumes">
-                  <Button size="lg" variant="outline" className="text-lg px-8 py-6">
+                  <Button size="sm" variant="outline">
                     View My Resumes
                   </Button>
                 </Link>
-              )}
-            </div>
+                <Link to="/my-company-profiles">
+                  <Button size="sm" variant="outline">
+                    View My Company Profiles
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </section>
