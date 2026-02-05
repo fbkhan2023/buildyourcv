@@ -34,27 +34,28 @@ export const ExportButtons = () => {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
         orientation: 'portrait',
-        unit: 'in',
+        unit: 'px',
         format: 'letter',
+        hotfixes: ['px_scaling'],
       });
 
-      const pageWidth = 8.5;
-      const pageHeight = 11;
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      // Handle multi-page if content is taller than one page
       let heightLeft = imgHeight;
       let position = 0;
-
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      let pageNumber = 0;
 
       while (heightLeft > 0) {
-        position = -pageHeight + (imgHeight - heightLeft - pageHeight);
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, -(imgHeight - heightLeft), imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+        if (pageNumber > 0) {
+          pdf.addPage();
+        }
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pdfHeight;
+        position -= pdfHeight;
+        pageNumber++;
       }
 
       pdf.save(`${resumeData.personalInfo.fullName || 'resume'}.pdf`);
