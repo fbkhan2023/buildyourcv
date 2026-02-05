@@ -306,11 +306,15 @@ export const ResumePreview = () => {
         'w-full max-w-[8.5in] mx-auto shadow-elevated rounded-lg overflow-hidden',
         styles.container
       )}
-      style={{ minHeight: '11in', padding: '0 1.5rem' }}
+      style={{ minHeight: '11in' }}
     >
-      {/* Header - Compact */}
-      <div className={cn(styles.header, 'relative py-4 px-6')}>
-        <div className="flex items-center gap-4">
+      {/* Header - Full Width for Modern */}
+      <div className={cn(
+        styles.header, 
+        'relative',
+        template === 'modern' ? 'py-3 px-6 -mx-0' : 'py-3 px-6 mx-6'
+      )} style={template === 'modern' ? { marginLeft: 0, marginRight: 0 } : undefined}>
+        <div className="flex items-center gap-3">
           {/* Photo */}
           {personalInfo.photo && (
             <div className="flex-shrink-0">
@@ -318,70 +322,70 @@ export const ResumePreview = () => {
                 src={personalInfo.photo}
                 alt={personalInfo.fullName}
                 className={cn(
-                  'w-20 h-20 rounded-full object-cover border-3',
+                  'w-16 h-16 rounded-full object-cover border-2',
                   template === 'modern' ? 'border-white/30' : 'border-primary/20'
                 )}
               />
             </div>
           )}
           
-          <div className="flex-1 space-y-1">
+          <div className="flex-1 space-y-0">
             <h1 className={cn(
-              'text-2xl font-display font-bold leading-tight',
+              'text-xl font-display font-bold leading-none mb-0.5',
               template !== 'modern' && 'text-foreground'
             )}>
               {personalInfo.fullName || 'Your Name'}
             </h1>
             {personalInfo.desiredJob && (
               <p className={cn(
-                'text-lg leading-tight',
+                'text-base leading-none mb-1',
                 template === 'modern' ? 'text-white/90' : 'text-muted-foreground'
               )}>
                 {personalInfo.desiredJob}
               </p>
             )}
             <div className={cn(
-              'flex flex-wrap gap-x-3 gap-y-0.5 text-xs leading-tight',
+              'flex flex-wrap gap-x-2 gap-y-0 text-xs leading-none',
               template === 'modern' ? 'text-white/80' : 'text-muted-foreground'
             )}>
               {personalInfo.email && (
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-0.5">
                   <Mail className="h-3 w-3" />
                   {personalInfo.email}
                 </span>
               )}
               {personalInfo.phone && (
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-0.5">
                   <Phone className="h-3 w-3" />
                   {personalInfo.phone}
                 </span>
               )}
               {personalInfo.location && (
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-0.5">
                   <MapPin className="h-3 w-3" />
                   {personalInfo.location}
                 </span>
               )}
               {personalInfo.linkedin && (
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-0.5">
                   <Linkedin className="h-3 w-3" />
                   {personalInfo.linkedin}
                 </span>
               )}
               {personalInfo.website && (
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-0.5">
                   <Globe className="h-3 w-3" />
                   {personalInfo.website}
                 </span>
               )}
               {personalInfo.dateOfBirth && (
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-0.5">
                   <Cake className="h-3 w-3" />
                   DOB: {formatFullDate(personalInfo.dateOfBirth)}
                 </span>
               )}
               {personalInfo.nationality && (
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-0.5">
                   <Flag className="h-3 w-3" />
                   {personalInfo.nationality}
                 </span>
