@@ -13,11 +13,18 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export const CompanyCertificationsForm = () => {
   const { profileData, addCertification, updateCertification, removeCertification } = useCompanyProfile();
   const { certifications } = profileData;
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
+  const [lightboxCert, setLightboxCert] = useState<typeof certifications[0] | null>(null);
 
   const handleAddCertification = () => {
     addCertification({
@@ -68,7 +75,10 @@ export const CompanyCertificationsForm = () => {
                   {certificatesWithFiles.map((cert) => (
                     <CarouselItem key={cert.id} className="md:basis-1/2 lg:basis-1/3">
                       <div className="p-2">
-                        <div className="relative group rounded-lg border bg-muted/30 overflow-hidden aspect-[4/3] flex items-center justify-center">
+                        <div
+                          className="relative group rounded-lg border bg-muted/30 overflow-hidden aspect-[4/3] flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                          onClick={() => setLightboxCert(cert)}
+                        >
                           {cert.certificateUrl.startsWith('data:image') ? (
                             <img
                               src={cert.certificateUrl}
@@ -219,6 +229,40 @@ export const CompanyCertificationsForm = () => {
           <Plus className="h-4 w-4 mr-2" /> Add Certification
         </Button>
       </CardContent>
+
+      {/* Lightbox Dialog */}
+      <Dialog open={!!lightboxCert} onOpenChange={(open) => !open && setLightboxCert(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>{lightboxCert?.name || 'Certificate'}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 overflow-auto">
+            {lightboxCert?.certificateUrl?.startsWith('data:image') ? (
+              <img
+                src={lightboxCert.certificateUrl}
+                alt={lightboxCert.name || 'Certificate'}
+                className="max-w-full max-h-[70vh] object-contain rounded-lg"
+              />
+            ) : lightboxCert?.certificateUrl ? (
+              <div className="flex flex-col items-center gap-3 py-8">
+                <FileText className="h-20 w-20 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">PDF document uploaded</p>
+              </div>
+            ) : null}
+            <div className="text-center space-y-1">
+              {lightboxCert?.issuingAuthority && (
+                <p className="text-sm text-muted-foreground">Issued by: {lightboxCert.issuingAuthority}</p>
+              )}
+              {lightboxCert?.issueDate && (
+                <p className="text-sm text-muted-foreground">Issued: {lightboxCert.issueDate}</p>
+              )}
+              {lightboxCert?.expiryDate && (
+                <p className="text-sm text-muted-foreground">Expires: {lightboxCert.expiryDate}</p>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
