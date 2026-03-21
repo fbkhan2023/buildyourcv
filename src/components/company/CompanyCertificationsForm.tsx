@@ -75,7 +75,10 @@ export const CompanyCertificationsForm = () => {
                   {certificatesWithFiles.map((cert) => (
                     <CarouselItem key={cert.id} className="md:basis-1/2 lg:basis-1/3">
                       <div className="p-2">
-                        <div className="relative group rounded-lg border bg-muted/30 overflow-hidden aspect-[4/3] flex items-center justify-center">
+                        <div
+                          className="relative group rounded-lg border bg-muted/30 overflow-hidden aspect-[4/3] flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                          onClick={() => setLightboxCert(cert)}
+                        >
                           {cert.certificateUrl.startsWith('data:image') ? (
                             <img
                               src={cert.certificateUrl}
