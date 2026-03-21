@@ -13,6 +13,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export const CompanyCertificationsForm = () => {
   const { profileData, addCertification, updateCertification, removeCertification } = useCompanyProfile();
