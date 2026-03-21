@@ -229,6 +229,40 @@ export const CompanyCertificationsForm = () => {
           <Plus className="h-4 w-4 mr-2" /> Add Certification
         </Button>
       </CardContent>
+
+      {/* Lightbox Dialog */}
+      <Dialog open={!!lightboxCert} onOpenChange={(open) => !open && setLightboxCert(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>{lightboxCert?.name || 'Certificate'}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 overflow-auto">
+            {lightboxCert?.certificateUrl?.startsWith('data:image') ? (
+              <img
+                src={lightboxCert.certificateUrl}
+                alt={lightboxCert.name || 'Certificate'}
+                className="max-w-full max-h-[70vh] object-contain rounded-lg"
+              />
+            ) : lightboxCert?.certificateUrl ? (
+              <div className="flex flex-col items-center gap-3 py-8">
+                <FileText className="h-20 w-20 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">PDF document uploaded</p>
+              </div>
+            ) : null}
+            <div className="text-center space-y-1">
+              {lightboxCert?.issuingAuthority && (
+                <p className="text-sm text-muted-foreground">Issued by: {lightboxCert.issuingAuthority}</p>
+              )}
+              {lightboxCert?.issueDate && (
+                <p className="text-sm text-muted-foreground">Issued: {lightboxCert.issueDate}</p>
+              )}
+              {lightboxCert?.expiryDate && (
+                <p className="text-sm text-muted-foreground">Expires: {lightboxCert.expiryDate}</p>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
