@@ -23,6 +23,7 @@ import {
 export const CompanyCertificationsForm = () => {
   const { profileData, addCertification, updateCertification, removeCertification } = useCompanyProfile();
   const { certifications } = profileData;
+  const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
   const [lightboxCert, setLightboxCert] = useState<typeof certifications[0] | null>(null);
 
   const handleAddCertification = () => {
